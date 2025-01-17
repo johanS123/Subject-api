@@ -22,8 +22,6 @@ namespace SubjectCRUD.Controllers
         {
             var students = await _context.Students.ToListAsync();
             return Ok(students);
-            //.Include(e => e.Registrations)
-            //.ThenInclude(i => i.Subject)
 
         }
 
@@ -89,7 +87,7 @@ namespace SubjectCRUD.Controllers
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
 
-            return Ok("Estudiante eliminado con éxito.");
+            return NoContent();
         }
     }
 }

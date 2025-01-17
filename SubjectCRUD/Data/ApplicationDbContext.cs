@@ -11,11 +11,15 @@ namespace SubjectCRUD.Data
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Teacher> Teachers { get; set; } = null!;
         public DbSet<Registration> Registrations { get; set; } = null!;
-        public DbSet<User> Users { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Teacher>()
+                .HasMany(t => t.Subjects)
+                .WithOne(s => s.Teacher)
+                .HasForeignKey(s => s.TeacherId);
 
             // Relación Estudiante ↔ Inscripciones
             modelBuilder.Entity<Registration>()

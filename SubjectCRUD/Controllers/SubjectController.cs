@@ -39,11 +39,18 @@ namespace SubjectCRUD.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Subject>> CreateProduct(Subject subject)
+        public async Task<ActionResult<Subject>> CreateSubject(Subject subject)
         {
-            if (!Enum.IsDefined(typeof(Modality), subject.Modality))
+            var nameSubject = await _context.Subjects.CountAsync(i => i.NameSubject == subject.NameSubject);
+            if (nameSubject > 0)
             {
-                return BadRequest("Invalid modality. Allowed values are 'Virtual' or 'Presencial'.");
+                return BadRequest("La materia que intenta agregar ya existe.");
+            }
+
+            var totalSubjests = await _context.Subjects.CountAsync(i => i.TeacherId == subject.TeacherId);
+            if (totalSubjests >= 2)
+            {
+                return BadRequest("El Profesor no puede tener más de 2 materias.");
             }
 
             _context.Subjects.Add(subject);
@@ -63,8 +70,8 @@ namespace SubjectCRUD.Controllers
             try
             {
                 subject.NameSubject = updatedSubject.NameSubject;
-                subject.Modality = updatedSubject.Modality;
                 subject.Credits = updatedSubject.Credits;
+                subject.TeacherId = updatedSubject.TeacherId;
 
                 await _context.SaveChangesAsync();
             }

@@ -20,9 +20,23 @@ namespace SubjectCRUD.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Teacher>>> GetTeachers()
         {
-            return await _context.Teachers
-               .Include(p => p.Subjects)
-               .ToListAsync();
+            var teachers = await _context.Teachers
+                    .Include(t => t.Subjects)
+                    .Select(t => new
+                    {
+                        t.TeacherId,
+                        t.NameTeacher,
+                        t.Document,
+                        Subjects = t.Subjects.Select(s => new
+                        {
+                            s.SubjectId,
+                            s.NameSubject,
+                            s.Credits
+                        })
+                    })
+                    .ToListAsync();
+
+            return Ok(teachers);
         }
 
         [HttpGet("{id}")]
@@ -86,7 +100,7 @@ namespace SubjectCRUD.Controllers
             _context.Teachers.Remove(teacher);
             await _context.SaveChangesAsync();
 
-            return Ok("Profesor eliminado con éxito.");
+            return NoContent();
         }
 
     }
